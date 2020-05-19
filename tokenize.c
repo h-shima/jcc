@@ -9,10 +9,11 @@
 
 // Token
 typedef enum {
-	TK_SYMBOL, // Single-letter punctuactors
-	TK_IDENT,  // Identifier
-	TK_NUM,    // Numeric literals
-	TK_EOF,    // Enf-of-file markers
+	TK_RESERVED, // Keywords
+	TK_SYMBOL,  // Single-letter punctuactors
+	TK_IDENT,   // Identifier
+	TK_NUM,     // Numeric literals
+	TK_EOF,     // Enf-of-file markers
 } TokenKind;
 
 typedef struct Token Token;
@@ -23,6 +24,12 @@ struct Token {
 	char *loc;      // Token location
 	int len;        // Token length
 };
+
+// Consumes the current token if it matches `op`
+bool equal(Token *tok, char *op) {
+	return strlen(op) == tok->len &&
+		!strncmp(tok->loc, op, tok->len);
+}
 
 static Token *new_token(TokenKind kind, Token *cur, char *str, int len) {
 	Token *tok = calloc(1, sizeof(Token));
@@ -39,6 +46,22 @@ static bool is_alpha(char c) {
 
 static bool is_alnum(char c) {
 	return is_alpha(c) || ('0' <= c && c <= '9');
+}
+
+static bool is_keyword(Token *tok) {
+	static char *kw[] = {"class", "constructor", "function", "method", "field", "static", "var", "int", "char", "boolean",
+					  "void", "true", "false", "null", "this", "let", "do", "if", "else", "while", "return"};
+
+	for (int i = 0; i < sizeof(kw) / sizeof(*kw); i++)
+		if (equal(tok, kw[i]))
+			return true;
+	return false;
+}
+
+static void convert_keywords(Token *tok) {
+	for (Token *t = tok; t->kind != TK_EOF; t = t->next)
+		if (t->kind == TK_IDENT && is_keyword(t))
+			t->kind = TK_RESERVED;
 }
 
 static Token *tokenize(char *p) {
@@ -75,6 +98,7 @@ static Token *tokenize(char *p) {
 	}
 
 	new_token(TK_EOF, cur, p, 0);
+	convert_keywords(head.next);
 	return head.next;
 }
 
@@ -96,6 +120,9 @@ int main(int argc, char **argv) {
 
 		if (cur->kind == TK_SYMBOL)
 			printf("token_type: %s, symbol: %s\n", STR(TK_SYMBOL), strndup(cur->loc, 1));
+
+		if (cur->kind == TK_RESERVED)
+			printf("token_type: %s, keyword: %s\n", STR(TK_RESERVED), strndup(cur->loc, cur->len));
 
 		cur = cur->next;
 	}
