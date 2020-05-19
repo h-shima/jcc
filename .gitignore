@@ -5,7 +5,7 @@ cmake-build-debug/
 *.o
 tmp*
 a.out
-jcc
+jcc*
 main
 tokenize
 compare
