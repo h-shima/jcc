@@ -9,9 +9,10 @@
 
 // Token
 typedef enum {
-	TK_IDENT, // Identifier
-	TK_NUM,   // Numeric literals
-	TK_EOF,   // Enf-of-file markers
+	TK_SYMBOL, // Single-letter punctuactors
+	TK_IDENT,  // Identifier
+	TK_NUM,    // Numeric literals
+	TK_EOF,    // Enf-of-file markers
 } TokenKind;
 
 typedef struct Token Token;
@@ -63,6 +64,12 @@ static Token *tokenize(char *p) {
 			continue;
 		}
 
+		// Single-letter punctuators
+		if (ispunct(*p)) {
+			cur = new_token(TK_SYMBOL, cur, p++, 1);
+			continue;
+		}
+
 		fprintf(stderr, "不正なトークンが含まれています");
 		exit(1);
 	}
@@ -86,6 +93,9 @@ int main(int argc, char **argv) {
 
 		if (cur->kind == TK_IDENT)
 			printf("token_type: %s, identifier: %s\n", STR(TK_IDENT), strndup(cur->loc, cur->len));
+
+		if (cur->kind == TK_SYMBOL)
+			printf("token_type: %s, symbol: %s\n", STR(TK_SYMBOL), strndup(cur->loc, 1));
 
 		cur = cur->next;
 	}
