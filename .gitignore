@@ -6,7 +6,9 @@ cmake-build-debug/
 tmp*
 a.out
 jcc
+main
 tokenize
 compare
 *.xml
 *.txt
+*.jack
