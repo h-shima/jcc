@@ -1,0 +1,11 @@
+CMakeLists.txt
+cmake-build-debug/
+.idea/
+*~
+*.o
+tmp*
+a.out
+jcc
+compare
+*.xml
+*.txt
