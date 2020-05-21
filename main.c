@@ -26,7 +26,6 @@ char *read_file(char *path) {
 	return buf;
 }
 
-
 int main(int argc, char **argv) {
 	if (argc != 2) {
 		fprintf(stderr, "引数の個数が正しくありません\n");
@@ -34,49 +33,19 @@ int main(int argc, char **argv) {
 	}
 
 	char *input = read_file(argv[1]);
-	Token *cur = tokenize(input);
+	Token *tok = tokenize(input);
+	Node *node = parse(tok);
 
 	FILE *fout;
-	fout = fopen("Output.xml", "w");
+	fout = fopen("Main.vm", "w");
 	if (fout == NULL) {
 		fprintf(stderr, "出力ファイルをオープンできません");
 		exit(1);
 	}
 
-	fprintf(fout, "<tokens>\n");
-
-	while (cur->kind != TK_EOF) {
-		if (cur->kind == TK_NUM)
-			fprintf(fout, "<integerConstant>%ld</integerConstant>\n", cur->val);
-
-		if (cur->kind == TK_IDENT)
-			fprintf(fout, "<identifier>%s</identifier>\n", strndup(cur->loc, cur->len));
-
-		if (cur->kind == TK_SYMBOL) {
-			// XMLで<, >, &をエスケープするため
-			if (!strncmp(cur->loc, "<", 1))
-				fprintf(fout, "<symbol>&lt;</symbol>\n");
-
-			if (!strncmp(cur->loc, ">", 1))
-				fprintf(fout, "<symbol>&gt;</symbol>\n");
-
-			if (!strncmp(cur->loc, "&", 1))
-				fprintf(fout, "<symbol>&amp;</symbol>\n");
-
-			if (strncmp(cur->loc, "<", 1) && strncmp(cur->loc, ">", 1) && strncmp(cur->loc, "&", 1))
-				fprintf(fout, "<symbol>%s</symbol>\n", strndup(cur->loc, 1));
-		}
-
-		if (cur->kind == TK_RESERVED)
-			fprintf(fout, "<keyword>%s</keyword>\n", strndup(cur->loc, cur->len));
-
-		if (cur->kind == TK_STR)
-			fprintf(fout, "<stringConstant>%s</stringConstant>\n", strndup(cur->contents, cur->cont_len));
-
-		cur = cur->next;
+	for (Node *cur = node; cur; cur = cur->next) {
+		fprintf(fout, "%ld\n", cur->val);
 	}
-
-	fprintf(fout, "</tokens>");
 
 	fclose(fout);
 	return 0;
