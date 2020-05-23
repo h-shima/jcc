@@ -1,4 +1,5 @@
 #include "jcc.h"
+char *cur_fname_without_ext;
 
 // 指定されたファイルの内容を返す
 char *read_file(char *path) {
@@ -32,6 +33,7 @@ int main(int argc, char **argv) {
 		return 1;
 	}
 
+	cur_fname_without_ext = remove_extension(argv[1]);
 	char *input = read_file(argv[1]);
 	Token *tok = tokenize(input);
 	Node *node = parse(tok);
