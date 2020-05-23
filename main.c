@@ -36,17 +36,7 @@ int main(int argc, char **argv) {
 	Token *tok = tokenize(input);
 	Node *node = parse(tok);
 
-	FILE *fout;
-	fout = fopen("Main.vm", "w");
-	if (fout == NULL) {
-		fprintf(stderr, "出力ファイルをオープンできません");
-		exit(1);
-	}
-
-	for (Node *cur = node; cur; cur = cur->next) {
-		fprintf(fout, "%ld\n", cur->val);
-	}
-
-	fclose(fout);
+	// Traverse the AST to emit VM code.
+	codegen(node);
 	return 0;
 }
