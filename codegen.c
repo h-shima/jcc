@@ -13,6 +13,12 @@ static void gen_expr(Node *node) {
 		return;
 	}
 
+	if (node->kind == ND_NOT) {
+		gen_expr(node->lhs);
+		fprintf(fout, "not\n");
+		return;
+	}
+
 	gen_expr(node->lhs);
 	gen_expr(node->rhs);
 

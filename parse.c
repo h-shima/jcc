@@ -34,7 +34,6 @@
 //                | identifier '.' identifier '(' expressionList ')'
 // expressionList = (expression (',' expression)*)?
 // op = '+' | '-' | '*' | '/' | '&' | '|' | '<' | '>' | '='
-// unaryOp = '-' | '~'
 // keywordConstant = 'true' | 'false' | 'null' | 'this'
 static Node *new_node(NodeKind kind) {
 	Node *node = calloc(1, sizeof(Node));
@@ -63,10 +62,16 @@ static long get_number(Token *tok) {
 
 // term = integerConstant
 //      | unary_op term
-// unary_op = '-'
+// unary_op = '-' | '~'
 Node *term(Token **rest, Token *tok) {
 	if (startswith(tok->loc, "-")) {
 		Node *node = new_node(ND_NEG);
+		node->lhs = term(rest, tok->next);
+		return node;
+	}
+
+	if (startswith(tok->loc, "~")) {
+		Node *node = new_node(ND_NOT);
 		node->lhs = term(rest, tok->next);
 		return node;
 	}
@@ -80,7 +85,7 @@ Node *term(Token **rest, Token *tok) {
 // expr = term (op term)*
 // term = integerConstant
 //      | unary_op term
-// unaryOp = '-'
+// unaryOp = '-' | '~'
 // op = '+' | '-' | '*' | '/' | '&' | '|'
 Node *parse(Token *tok) {
 	Node *node = term(&tok, tok);
