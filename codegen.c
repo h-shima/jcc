@@ -17,6 +17,12 @@ static void gen_expr(Node *node) {
 	case ND_SUB:
 		fprintf(fout, "sub\n");
 		return;
+	case ND_MUL:
+		fprintf(fout, "call Math.multiply 2\n");
+		return;
+	case ND_DIV:
+		fprintf(fout, "call Math.divide 2\n");
+		return;
 	default:
 		fprintf(stderr, "不正な式です");
 	}

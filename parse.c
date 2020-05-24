@@ -85,6 +85,18 @@ Node *parse(Token *tok) {
 			continue;
 		}
 
+		if (equal(tok, "*")) {
+			node = new_binary(ND_MUL, node, new_num(get_number(tok->next)));
+			tok = tok->next->next;
+			continue;
+		}
+
+		if (equal(tok, "/")) {
+			node = new_binary(ND_DIV, node, new_num(get_number(tok->next)));
+			tok = tok->next->next;
+			continue;
+		}
+
 		cur = cur->next = node;
 		return head.next;
 	}

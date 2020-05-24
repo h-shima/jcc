@@ -1,0 +1,7 @@
+push constant 1
+push constant 2
+call Math.divide 2
+push constant 3
+call Math.divide 2
+push constant 4
+call Math.divide 2
