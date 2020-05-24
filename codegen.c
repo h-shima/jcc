@@ -23,6 +23,12 @@ static void gen_expr(Node *node) {
 	case ND_DIV:
 		fprintf(fout, "call Math.divide 2\n");
 		return;
+	case ND_AND:
+		fprintf(fout, "and\n");
+		return;
+	case ND_OR:
+		fprintf(fout, "or\n");
+		return;
 	default:
 		fprintf(stderr, "不正な式です");
 	}
