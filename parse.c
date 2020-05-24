@@ -33,7 +33,6 @@
 // subroutineCall = subroutineName '(' expressionList ')
 //                | identifier '.' identifier '(' expressionList ')'
 // expressionList = (expression (',' expression)*)?
-// op = '+' | '-' | '*' | '/' | '&' | '|' | '<' | '>' | '='
 // keywordConstant = 'true' | 'false' | 'null' | 'this'
 static Node *new_node(NodeKind kind) {
 	Node *node = calloc(1, sizeof(Node));
@@ -86,7 +85,7 @@ Node *term(Token **rest, Token *tok) {
 // term = integerConstant
 //      | unary_op term
 // unaryOp = '-' | '~'
-// op = '+' | '-' | '*' | '/' | '&' | '|'
+// op = '+' | '-' | '*' | '/' | '&' | '|' | '<' | '>' | '='
 Node *parse(Token *tok) {
 	Node *node = term(&tok, tok);
 
@@ -119,6 +118,21 @@ Node *parse(Token *tok) {
 
 			if (equal(tok, "|")) {
 				node = new_binary(ND_OR, node, term(&tok, tok->next));
+				continue;
+			}
+
+			if (equal(tok, "<")) {
+				node = new_binary(ND_LT, node, term(&tok, tok->next));
+				continue;
+			}
+
+			if (equal(tok, ">")) {
+				node = new_binary(ND_GT, node, term(&tok, tok->next));
+				continue;
+			}
+
+			if (equal(tok, "=")) {
+				node = new_binary(ND_EQ, node, term(&tok, tok->next));
 				continue;
 			}
 

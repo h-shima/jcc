@@ -41,6 +41,15 @@ static void gen_expr(Node *node) {
 	case ND_OR:
 		fprintf(fout, "or\n");
 		return;
+	case ND_LT:
+		fprintf(fout, "lt\n");
+		return;
+	case ND_GT:
+		fprintf(fout, "gt\n");
+		return;
+	case ND_EQ:
+		fprintf(fout, "eq\n");
+		return;
 	default:
 		fprintf(stderr, "不正な式です");
 		return;
