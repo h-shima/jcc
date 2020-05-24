@@ -36,7 +36,6 @@
 // op = '+' | '-' | '*' | '/' | '&' | '|' | '<' | '>' | '='
 // unaryOp = '-' | '~'
 // keywordConstant = 'true' | 'false' | 'null' | 'this'
-
 static Node *new_node(NodeKind kind) {
 	Node *node = calloc(1, sizeof(Node));
 	node->kind = kind;
@@ -62,54 +61,64 @@ static long get_number(Token *tok) {
 	return tok->val;
 }
 
-// expr = num (op num)*
-// op = '+' | '-'
-Node *parse(Token *tok) {
-	Node head = {};
-	Node *cur = &head;
-
-	// １文字目は必ず数字
-	Node *node = new_num(tok->val);
-	tok = tok->next;
-
-	for (;;) {
-		if (equal(tok, "+")) {
-			node = new_binary(ND_ADD, node, new_num(get_number(tok->next)));
-			tok = tok->next->next;
-			continue;
-		}
-
-		if (equal(tok, "-")) {
-			node = new_binary(ND_SUB, node, new_num(get_number(tok->next)));
-			tok = tok->next->next;
-			continue;
-		}
-
-		if (equal(tok, "*")) {
-			node = new_binary(ND_MUL, node, new_num(get_number(tok->next)));
-			tok = tok->next->next;
-			continue;
-		}
-
-		if (equal(tok, "/")) {
-			node = new_binary(ND_DIV, node, new_num(get_number(tok->next)));
-			tok = tok->next->next;
-			continue;
-		}
-
-		if (equal(tok, "&")) {
-			node = new_binary(ND_AND, node, new_num(get_number(tok->next)));
-			tok = tok->next->next;
-			continue;
-		}
-
-		if (equal(tok, "|")) {
-			node = new_binary(ND_OR, node, new_num(get_number(tok->next)));
-			tok = tok->next->next;
-			continue;
-		}
-
-		cur = cur->next = node;
-		return head.next;
+// term = integerConstant
+//      | unary_op term
+// unary_op = '-'
+Node *term(Token **rest, Token *tok) {
+	if (startswith(tok->loc, "-")) {
+		Node *node = new_node(ND_NEG);
+		node->lhs = term(rest, tok->next);
+		return node;
 	}
+
+	Node *node = new_num(tok->val);
+
+	*rest = tok->next;
+	return node;
+}
+
+// expr = term (op term)*
+// term = integerConstant
+//      | unary_op term
+// unaryOp = '-'
+// op = '+' | '-' | '*' | '/' | '&' | '|'
+Node *parse(Token *tok) {
+	Node *node = term(&tok, tok);
+
+	if (tok->kind != TK_EOF) {
+		for (;;) {
+			if (equal(tok, "+")) {
+				node = new_binary(ND_ADD, node, term(&tok, tok->next));
+				continue;
+			}
+
+			if (equal(tok, "-")) {
+				node = new_binary(ND_SUB, node, term(&tok, tok->next));
+				continue;
+			}
+
+			if (equal(tok, "*")) {
+				node = new_binary(ND_MUL, node, term(&tok, tok->next));
+				continue;
+			}
+
+			if (equal(tok, "/")) {
+				node = new_binary(ND_DIV, node, term(&tok, tok->next));
+				continue;
+			}
+
+			if (equal(tok, "&")) {
+				node = new_binary(ND_AND, node, term(&tok, tok->next));
+				continue;
+			}
+
+			if (equal(tok, "|")) {
+				node = new_binary(ND_OR, node, term(&tok, tok->next));
+				continue;
+			}
+
+			return node;
+		}
+	}
+	return node;
 }

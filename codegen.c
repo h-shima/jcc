@@ -7,6 +7,12 @@ static void gen_expr(Node *node) {
 		return;
 	}
 
+	if (node->kind == ND_NEG) {
+		gen_expr(node->lhs);
+		fprintf(fout, "neg\n");
+		return;
+	}
+
 	gen_expr(node->lhs);
 	gen_expr(node->rhs);
 
@@ -31,6 +37,7 @@ static void gen_expr(Node *node) {
 		return;
 	default:
 		fprintf(stderr, "不正な式です");
+		return;
 	}
 }
 

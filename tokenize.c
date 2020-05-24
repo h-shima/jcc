@@ -6,7 +6,7 @@ bool equal(Token *tok, char *op) {
 		!strncmp(tok->loc, op, tok->len);
 }
 
-static bool startswith(char *p, char *q) {
+bool startswith(char *p, char *q) {
 	return strncmp(p, q, strlen(q)) == 0;
 }
 
