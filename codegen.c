@@ -10,9 +10,15 @@ static void gen_expr(Node *node) {
 	gen_expr(node->lhs);
 	gen_expr(node->rhs);
 
-	if (node->kind == ND_ADD) {
-		fprintf(fout, "add\n");
+	switch (node->kind) {
+    case ND_ADD:
+        fprintf(fout, "add\n");
+        return;
+	case ND_SUB:
+		fprintf(fout, "sub\n");
 		return;
+	default:
+		fprintf(stderr, "不正な式です");
 	}
 }
 

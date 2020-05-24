@@ -62,7 +62,8 @@ static long get_number(Token *tok) {
 	return tok->val;
 }
 
-// expr = num ('+' num)*
+// expr = num (op num)*
+// op = '+' | '-'
 Node *parse(Token *tok) {
 	Node head = {};
 	Node *cur = &head;
@@ -74,6 +75,12 @@ Node *parse(Token *tok) {
 	for (;;) {
 		if (equal(tok, "+")) {
 			node = new_binary(ND_ADD, node, new_num(get_number(tok->next)));
+			tok = tok->next->next;
+			continue;
+		}
+
+		if (equal(tok, "-")) {
+			node = new_binary(ND_SUB, node, new_num(get_number(tok->next)));
 			tok = tok->next->next;
 			continue;
 		}
