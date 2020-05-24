@@ -37,18 +37,48 @@
 // unaryOp = '-' | '~'
 // keywordConstant = 'true' | 'false' | 'null' | 'this'
 
+static Node *new_node(NodeKind kind) {
+	Node *node = calloc(1, sizeof(Node));
+	node->kind = kind;
+	return node;
+}
+
+static Node *new_binary(NodeKind kind, Node *lhs, Node *rhs) {
+	Node *node = new_node(kind);
+	node->lhs = lhs;
+	node->rhs = rhs;
+	return node;
+}
+
+static Node *new_num(long val) {
+	Node *node = new_node(ND_NUM);
+	node->val = val;
+	return node;
+}
+
+static long get_number(Token *tok) {
+	if (tok->kind != TK_NUM)
+		fprintf(stderr, "数値ではありません");
+	return tok->val;
+}
+
+// expr = num ('+' num)*
 Node *parse(Token *tok) {
 	Node head = {};
 	Node *cur = &head;
 
-	while (tok->kind != TK_EOF) {
-		Node *node = calloc(1, sizeof(Node));
-		node->kind = ND_NUM;
-		node->val = tok->val;
+	// １文字目は必ず数字
+	Node *node = new_num(tok->val);
+	tok = tok->next;
+
+	for (;;) {
+		if (equal(tok, "+")) {
+			node = new_binary(ND_ADD, node, new_num(get_number(tok->next)));
+			tok = tok->next->next;
+			continue;
+		}
+
 		cur = cur->next = node;
-
-		tok = tok->next;
+		return head.next;
 	}
-
-	return head.next;
 }

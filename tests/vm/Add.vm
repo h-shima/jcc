@@ -1,0 +1,7 @@
+push constant 100
+push constant 200
+add
+push constant 300
+add
+push constant 400
+add

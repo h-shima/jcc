@@ -1,7 +1,7 @@
 #include "jcc.h"
 
 // Consumes the current token if it matches `op`
-static bool equal(Token *tok, char *op) {
+bool equal(Token *tok, char *op) {
 	return strlen(op) == tok->len &&
 		!strncmp(tok->loc, op, tok->len);
 }
