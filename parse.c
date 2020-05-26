@@ -86,7 +86,7 @@ Node *term(Token **rest, Token *tok) {
 //      | unary_op term
 // unaryOp = '-' | '~'
 // op = '+' | '-' | '*' | '/' | '&' | '|' | '<' | '>' | '='
-Node *parse(Token *tok) {
+Node *expr(Token **rest, Token *tok) {
 	Node *node = term(&tok, tok);
 
 	if (tok->kind != TK_EOF) {
@@ -136,8 +136,16 @@ Node *parse(Token *tok) {
 				continue;
 			}
 
+			*rest = tok;
 			return node;
 		}
 	}
 	return node;
 }
+
+Node *parse(Token *tok) {
+	Node *node;
+	node = expr(&tok, tok);
+	return node;
+}
+
