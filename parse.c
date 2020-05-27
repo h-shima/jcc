@@ -1,5 +1,10 @@
 #include "jcc.h"
 
+static Node *term(Token **rest, Token *tok);
+static Node *expr(Token **rest, Token *tok);
+static Node *stmt(Token **rest, Token *tok);
+static Node *compound_stmt(Token **rest, Token *tok);
+
 // 未実装のパース関数
 // program = class
 // class = 'class' identifier '{' classVarDec* subroutineDec* '}'
@@ -7,18 +12,17 @@
 // type = 'int' | 'char' | 'boolean' | identifier
 // subroutineDec = ('constructor' | 'function' | 'method') ('void' | type) subroutineName '(' parameterList ')' subroutineBody
 // parameterList = ((type varName) (',' type varName)*)?
-// subroutineBody = '{' varDec* statements '}'
+// subroutineBody = '{' varDec* statement* '}'
 // varDec = 'var' type varName (',' varName)* ';'
 
-// statements = statement*
 // statement = letStatement
 //           | ifStatement
 //           | whileStatement
 //           | doStatement
 //           | returnStatement
 // letStatement = 'let' varName ('[' expression ']')? '=' expression ';'
-// ifStatement = 'if' '(' expression ')' '{' statements '}' ('else' '{' statements '}')?
-// whileStatement = 'while' '(' expression ')' '{' statements '}'
+// ifStatement = 'if' '(' expression ')' '{' statement* '}' ('else' '{' statement* '}')?
+// whileStatement = 'while' '(' expression ')' '{' statement* '}'
 // doStatement = 'do' subroutineCall ';'
 // returnStatement = 'return' expression? ';'
 
@@ -62,7 +66,7 @@ static long get_number(Token *tok) {
 // term = integerConstant
 //      | unary_op term
 // unary_op = '-' | '~'
-Node *term(Token **rest, Token *tok) {
+static Node *term(Token **rest, Token *tok) {
 	if (startswith(tok->loc, "-")) {
 		Node *node = new_node(ND_NEG);
 		node->lhs = term(rest, tok->next);
@@ -160,10 +164,30 @@ static Node *stmt(Token **rest, Token *tok) {
 	exit(1);
 }
 
-// program = stmt
+// TODO: class, subroutineBodyを実装するときは先読みが必要になりそう。
+// compound_stmt = '{' stmt* '}'
+Node *compound_stmt(Token **rest, Token *tok) {
+	if (!equal(tok, "{"))
+		fprintf(stderr, "複文ではありません。");
+
+	Node *node = new_node(ND_BLOCK);
+	tok = tok->next;
+
+	Node head = {};
+	Node *cur = &head;
+
+	while (!equal(tok, "}"))
+		cur = cur->next = stmt(&tok, tok);
+
+	node->body = head.next;
+	*rest = tok->next;
+	return node;
+}
+
+// program = '{' stmt* '}'
 Node *parse(Token *tok) {
 	Node *node;
-	node = stmt(&tok, tok);
+	node = compound_stmt(&tok, tok);
 	return node;
 }
 

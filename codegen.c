@@ -63,6 +63,12 @@ static void gen_stmt(Node *node) {
 		return;
 	}
 
+	if (node->kind == ND_BLOCK) {
+		for (Node *n = node->body; n; n = n->next)
+			gen_stmt(n);
+		return;
+	}
+
 	fprintf(stderr, "不正な文です。");
 }
 
