@@ -3,3 +3,4 @@ push constant 2
 gt
 push constant 3
 gt
+return

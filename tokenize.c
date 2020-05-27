@@ -6,6 +6,13 @@ bool equal(Token *tok, char *op) {
 		!strncmp(tok->loc, op, tok->len);
 }
 
+// Ensure that the current token is `op`.
+Token *skip(Token *tok, char *op) {
+	if (!equal(tok, op))
+		fprintf(stderr, "expected '%s'", op);
+	return tok->next;
+}
+
 bool startswith(char *p, char *q) {
 	return strncmp(p, q, strlen(q)) == 0;
 }

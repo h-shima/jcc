@@ -3,3 +3,4 @@ push constant 2
 or
 push constant 3
 or
+return

@@ -3,4 +3,4 @@ push constant 2
 sub
 push constant 3
 sub
-
+return

@@ -56,6 +56,16 @@ static void gen_expr(Node *node) {
 	}
 }
 
+static void gen_stmt(Node *node) {
+	if (node->kind == ND_RETURN) {
+		gen_expr(node->lhs);
+		fprintf(fout, "return\n");
+		return;
+	}
+
+	fprintf(stderr, "不正な文です。");
+}
+
 void codegen(Node *node) {
 	char *fout_filename = cur_fname_without_ext;
 	strcat(fout_filename, ".vm");
@@ -66,7 +76,7 @@ void codegen(Node *node) {
 		exit(1);
 	}
 
-	gen_expr(node);
+	gen_stmt(node);
 
 	fclose(fout);
 }

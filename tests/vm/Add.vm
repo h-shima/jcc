@@ -5,3 +5,4 @@ push constant 300
 add
 push constant 400
 add
+return

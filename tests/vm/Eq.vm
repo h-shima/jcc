@@ -3,3 +3,4 @@ push constant 1
 eq
 push constant 10
 eq
+return

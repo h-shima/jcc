@@ -5,3 +5,4 @@ push constant 3
 call Math.multiply 2
 push constant 4
 call Math.multiply 2
+return

@@ -86,7 +86,7 @@ Node *term(Token **rest, Token *tok) {
 //      | unary_op term
 // unaryOp = '-' | '~'
 // op = '+' | '-' | '*' | '/' | '&' | '|' | '<' | '>' | '='
-Node *expr(Token **rest, Token *tok) {
+static Node *expr(Token **rest, Token *tok) {
 	Node *node = term(&tok, tok);
 
 	if (tok->kind != TK_EOF) {
@@ -143,9 +143,27 @@ Node *expr(Token **rest, Token *tok) {
 	return node;
 }
 
+// statement = returnStatement
+// returnStatement = 'return' expression? ';'
+static Node *stmt(Token **rest, Token *tok) {
+	if (equal(tok, "return")) {
+		Node *node = new_node(ND_RETURN);
+
+		if (!equal(tok->next, ";"))
+			node->lhs = expr(&tok, tok->next);
+
+		*rest = skip(tok, ";");
+		return node;
+	}
+
+	fprintf(stderr, "不正な文です。");
+	exit(1);
+}
+
+// program = stmt
 Node *parse(Token *tok) {
 	Node *node;
-	node = expr(&tok, tok);
+	node = stmt(&tok, tok);
 	return node;
 }
 

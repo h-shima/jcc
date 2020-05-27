@@ -3,3 +3,4 @@ push constant 2
 lt
 push constant 3
 lt
+return

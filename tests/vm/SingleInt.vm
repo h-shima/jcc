@@ -1,1 +1,2 @@
 push constant 42
+return
