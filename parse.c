@@ -148,7 +148,9 @@ static Node *expr(Token **rest, Token *tok) {
 }
 
 // statement = returnStatement
+//           | ifStatement
 // returnStatement = 'return' expression? ';'
+// ifStatement = 'if' '(' expression ')' '{' statement* '}' ('else' '{' statement* '}')?
 static Node *stmt(Token **rest, Token *tok) {
 	if (equal(tok, "return")) {
 		Node *node = new_node(ND_RETURN);
@@ -157,6 +159,21 @@ static Node *stmt(Token **rest, Token *tok) {
 			node->lhs = expr(&tok, tok->next);
 
 		*rest = skip(tok, ";");
+		return node;
+	}
+
+	if (equal(tok, "if")) {
+		Node *node = new_node(ND_IF);
+		tok = skip(tok->next, "(");
+		node->cond = expr(&tok, tok);
+
+		tok = skip(tok, ")");
+		node->then = compound_stmt(&tok, tok);
+
+		if (equal(tok, "else"))
+			node->els = compound_stmt(&tok, tok->next);
+
+		*rest = tok;
 		return node;
 	}
 
@@ -184,10 +201,10 @@ Node *compound_stmt(Token **rest, Token *tok) {
 	return node;
 }
 
-// program = '{' stmt* '}'
+// program = stmt
 Node *parse(Token *tok) {
 	Node *node;
-	node = compound_stmt(&tok, tok);
+	node = stmt(&tok, tok);
 	return node;
 }
 

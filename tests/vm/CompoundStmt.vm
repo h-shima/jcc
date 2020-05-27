@@ -1,7 +1,0 @@
-push constant 10
-push constant 20
-add
-return
-push constant 30
-not
-return

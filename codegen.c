@@ -1,5 +1,6 @@
 #include "jcc.h"
 static FILE *fout;
+static int labelseq = 1;
 
 static void gen_expr(Node *node) {
 	if (node->kind == ND_NUM) {
@@ -57,19 +58,33 @@ static void gen_expr(Node *node) {
 }
 
 static void gen_stmt(Node *node) {
-	if (node->kind == ND_RETURN) {
+	switch (node->kind) {
+	case ND_RETURN:
 		gen_expr(node->lhs);
 		fprintf(fout, "return\n");
 		return;
-	}
-
-	if (node->kind == ND_BLOCK) {
+	case ND_BLOCK:
 		for (Node *n = node->body; n; n = n->next)
 			gen_stmt(n);
 		return;
-	}
+	case ND_IF:{
+		int seq = labelseq++;
 
-	fprintf(stderr, "不正な文です。");
+		gen_expr(node->cond);
+		fprintf(fout, "if-goto IF_TRUE%d\n", seq);
+		fprintf(fout, "goto IF_FALSE%d\n", seq);
+		fprintf(fout, "label IF_TRUE%d\n", seq);
+		gen_stmt(node->then);
+		fprintf(fout, "goto IF_END%d\n", seq);
+		fprintf(fout, "label IF_FALSE%d\n", seq);
+		if (node->els != NULL)
+			gen_stmt(node->els);
+		fprintf(fout, "label IF_END%d\n", seq);
+		return;
+	}
+	default:
+		fprintf(stderr, "不正な文です。");
+	}
 }
 
 void codegen(Node *node) {

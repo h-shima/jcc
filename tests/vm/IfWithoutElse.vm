@@ -1,0 +1,11 @@
+push constant 100
+push constant 100
+eq
+if-goto IF_TRUE1
+goto IF_FALSE1
+label IF_TRUE1
+push constant 5
+return
+goto IF_END1
+label IF_FALSE1
+label IF_END1
