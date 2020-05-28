@@ -149,8 +149,10 @@ static Node *expr(Token **rest, Token *tok) {
 
 // statement = returnStatement
 //           | ifStatement
+//           | whileStatement
 // returnStatement = 'return' expression? ';'
 // ifStatement = 'if' '(' expression ')' '{' statement* '}' ('else' '{' statement* '}')?
+// whileStatement = 'while' '(' expression ')' '{' statement* '}'
 static Node *stmt(Token **rest, Token *tok) {
 	if (equal(tok, "return")) {
 		Node *node = new_node(ND_RETURN);
@@ -172,6 +174,18 @@ static Node *stmt(Token **rest, Token *tok) {
 
 		if (equal(tok, "else"))
 			node->els = compound_stmt(&tok, tok->next);
+
+		*rest = tok;
+		return node;
+	}
+
+	if (equal(tok, "while")) {
+		Node *node = new_node(ND_WHILE);
+		tok = skip(tok->next, "(");
+		node->cond = expr(&tok, tok);
+
+		tok = skip(tok, ")");
+		node->then = compound_stmt(&tok, tok);
 
 		*rest = tok;
 		return node;

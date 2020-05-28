@@ -1,0 +1,12 @@
+label WHILE_EXP1
+push constant 30
+push constant 30
+eq
+not
+if-goto WHILE_END1
+push constant 100
+push constant 200
+add
+return
+goto WHILE_EXP1
+label WHILE_END1

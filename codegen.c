@@ -82,6 +82,18 @@ static void gen_stmt(Node *node) {
 		fprintf(fout, "label IF_END%d\n", seq);
 		return;
 	}
+	case ND_WHILE:{
+		int seq = labelseq++;
+
+		fprintf(fout, "label WHILE_EXP%d\n", seq);
+		gen_expr(node->cond);
+		fprintf(fout, "not\n");
+		fprintf(fout, "if-goto WHILE_END%d\n", seq);
+		gen_stmt(node->then);
+		fprintf(fout, "goto WHILE_EXP%d\n", seq);
+		fprintf(fout, "label WHILE_END%d\n", seq);
+		return;
+	}
 	default:
 		fprintf(stderr, "不正な文です。");
 	}
